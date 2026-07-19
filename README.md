@@ -21,8 +21,11 @@ cloud-engineer-devops/
 ├── ansible/            # Configuration Management
 ├── python/             # Automation Scripts
 ├── ci-cd/              # CI/CD Pipelines
-├── monitoring/         # Monitoring Setup
+├── monitoring/         # Prometheus alerts, Alertmanager, Grafana provisioning
 ├── docker/             # Container Configuration
+├── k8s/                # Kubernetes manifests (Deployment/Service/Ingress/HPA)
+├── tests/              # Test suite
+├── Makefile            # Common developer commands (make help)
 └── docs/               # Documentation
 ```
 
@@ -38,8 +41,9 @@ cloud-engineer-devops/
 
 1. Clone the repository
 2. Navigate to the project directory
-3. Run `docker-compose up -d` to start the infrastructure
-4. Access the application at http://localhost:8080
+3. Create your environment file: `cp .env.example .env` and set strong passwords
+4. Run `docker compose up -d` to start the infrastructure
+5. Access the application at http://localhost:8080
 
 ## Features
 

@@ -15,12 +15,17 @@ git clone <repository-url>
 cd cloud-engineer-devops
 ```
 
-2. Start the infrastructure using Docker Compose:
+2. Create the environment file and set strong passwords:
 ```bash
-docker-compose up -d
+cp .env.example .env
 ```
 
-3. Verify the deployment:
+3. Start the infrastructure using Docker Compose:
+```bash
+docker compose up -d
+```
+
+4. Verify the deployment:
 ```bash
 curl http://localhost:8080/health
 ```
@@ -34,17 +39,23 @@ curl http://localhost:8080/health
 cd terraform
 ```
 
-2. Initialize Terraform:
+2. Provide required secret variables:
+```bash
+cp terraform.tfvars.example terraform.tfvars
+# edit terraform.tfvars and set postgres_password / grafana_admin_password
+```
+
+3. Initialize Terraform:
 ```bash
 terraform init
 ```
 
-3. Plan the deployment:
+4. Plan the deployment:
 ```bash
 terraform plan
 ```
 
-4. Apply the configuration:
+5. Apply the configuration:
 ```bash
 terraform apply
 ```

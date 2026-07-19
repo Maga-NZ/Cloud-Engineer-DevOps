@@ -6,6 +6,7 @@ variable "network_name" {
 variable "database_url" {
   description = "Database connection string"
   type        = string
+  sensitive   = true
 }
 
 resource "docker_image" "app" {
@@ -17,16 +18,16 @@ resource "docker_image" "app" {
 
 resource "docker_container" "app" {
   name  = "python-app"
-  image = docker_image.app.latest
-  
+  image = docker_image.app.image_id
+
   env = [
     "DATABASE_URL=${var.database_url}"
   ]
-  
+
   networks_advanced {
     name = var.network_name
   }
-  
+
   ports {
     internal = 5000
     external = 5000

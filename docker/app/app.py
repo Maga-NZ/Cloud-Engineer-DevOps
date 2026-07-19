@@ -40,20 +40,23 @@ def metrics():
 def get_data():
     REQUEST_COUNT.labels(method='GET', endpoint='/api/data').inc()
     start_time = time.time()
-    
+
+    conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('SELECT version();')
         version = cursor.fetchone()
         cursor.close()
-        conn.close()
-        
-        REQUEST_LATENCY.observe(time.time() - start_time)
-        return jsonify({'database_version': version[0]})
+
+        db_version = version[0] if version else None
+        return jsonify({'database_version': db_version})
     except Exception as e:
-        REQUEST_LATENCY.observe(time.time() - start_time)
         return jsonify({'error': str(e)}), 500
+    finally:
+        if conn is not None:
+            conn.close()
+        REQUEST_LATENCY.observe(time.time() - start_time)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False) 
