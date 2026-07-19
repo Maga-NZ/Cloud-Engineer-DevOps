@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import requests
-import time
+import argparse
 import logging
-import json
-from datetime import datetime
+import sys
+import time
+
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -77,11 +78,38 @@ class HealthChecker:
         return checks
 
 def main():
-    checker = HealthChecker()
-    
-    while True:
-        checker.run_all_checks()
-        time.sleep(60)
+    parser = argparse.ArgumentParser(description="Application health checker")
+    parser.add_argument(
+        "--url",
+        default="http://localhost:8080",
+        help="Base URL of the application (default: http://localhost:8080)",
+    )
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="Run the checks a single time and exit with a status code",
+    )
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=60,
+        help="Seconds between checks in continuous mode (default: 60)",
+    )
+    args = parser.parse_args()
+
+    checker = HealthChecker(base_url=args.url)
+
+    if args.once:
+        checks = checker.run_all_checks()
+        sys.exit(0 if all(checks.values()) else 1)
+
+    try:
+        while True:
+            checker.run_all_checks()
+            time.sleep(args.interval)
+    except KeyboardInterrupt:
+        logger.info("Stopping health checker")
+
 
 if __name__ == "__main__":
     main() 

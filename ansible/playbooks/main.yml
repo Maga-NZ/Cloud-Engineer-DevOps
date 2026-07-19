@@ -6,6 +6,8 @@
     app_user: appuser
     app_directory: /opt/app
     python_version: "3.9"
+    app_port: 5000
+    server_name: localhost
   
   tasks:
     - name: Update package cache
@@ -54,6 +56,12 @@
         src: /etc/nginx/sites-available/app
         dest: /etc/nginx/sites-enabled/app
         state: link
+      notify: restart nginx
+
+    - name: Disable default nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
       notify: restart nginx
     
     - name: Configure firewall

@@ -3,42 +3,56 @@ variable "network_name" {
   type        = string
 }
 
+variable "grafana_admin_password" {
+  description = "Grafana admin password"
+  type        = string
+  sensitive   = true
+}
+
+resource "docker_image" "prometheus" {
+  name = "prom/prometheus:latest"
+}
+
+resource "docker_image" "grafana" {
+  name = "grafana/grafana:latest"
+}
+
 resource "docker_container" "prometheus" {
   name  = "prometheus"
-  image = "prom/prometheus:latest"
-  
+  image = docker_image.prometheus.image_id
+
   networks_advanced {
     name = var.network_name
   }
-  
+
   ports {
     internal = 9090
     external = 9090
   }
-  
+
   volumes {
-    host_path      = "${path.module}/../../../monitoring/prometheus/prometheus.yml"
+    host_path      = abspath("${path.module}/../../../monitoring/prometheus/prometheus.yml")
     container_path = "/etc/prometheus/prometheus.yml"
   }
 }
 
 resource "docker_container" "grafana" {
   name  = "grafana"
-  image = "grafana/grafana:latest"
-  
+  image = docker_image.grafana.image_id
+
   env = [
-    "GF_SECURITY_ADMIN_PASSWORD=admin"
+    "GF_SECURITY_ADMIN_PASSWORD=${var.grafana_admin_password}"
   ]
-  
+
   networks_advanced {
     name = var.network_name
   }
-  
+
   ports {
     internal = 3000
     external = 3000
   }
-  
+
   depends_on = [docker_container.prometheus]
 }
 
